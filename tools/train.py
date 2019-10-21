@@ -1,5 +1,8 @@
 from __future__ import division
 
+import warnings
+warnings.simplefilter("ignore",UserWarning)
+
 import argparse
 from mmcv import Config
 
