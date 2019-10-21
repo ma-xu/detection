@@ -17,10 +17,11 @@ def parse_args():
     parser.add_argument('--work_dir', help='the dir to save logs and models')
     parser.add_argument(
         '--resume_from', help='the checkpoint file to resume from')
+    #validate for each epoch
     parser.add_argument(
         '--validate',
         action='store_true',
-        #default=True,
+        default=True,
         help='whether to evaluate the checkpoint during training')
     parser.add_argument(
         '--gpus',

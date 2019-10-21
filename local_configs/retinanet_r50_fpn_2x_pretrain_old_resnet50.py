@@ -2,9 +2,9 @@
 model = dict(
     type='RetinaNet',
     # pretrained='modelzoo://resnet50',
-    pretrained='/home/g1007540910/RDA_imagenet_GCP/checkpoints/imagenet/se_resnet50/model_best.pth.tar',
+    pretrained='/data/nfs_share/public/AS/pytorch-classification/checkpoints/imagenet/se_resnet50/model_best.pth.tar',
     backbone=dict(
-        type='ResNetSE',
+        type='ResNet',
         depth=50,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
@@ -104,7 +104,7 @@ lr_config = dict(
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(
-    interval=100,
+    interval=200,
     hooks=[
         dict(type='TextLoggerHook'),
         # dict(type='TensorboardLoggerHook')
@@ -115,7 +115,7 @@ total_epochs = 24
 device_ids = range(8)
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/retinanet_r50_fpn_2x_pretrain_se_resnet50'
+work_dir = './work_dirs/retinanet_r50_fpn_2x_pretrain_old_resnet50'
 load_from = None
 resume_from = None
 workflow = [('train', 1)]
