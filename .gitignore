@@ -10,3 +10,7 @@ dist/
 .egg/
 egg/
 *.egg-info/
+
+*.xml
+
+*.pyc
