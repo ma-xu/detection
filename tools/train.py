@@ -2,7 +2,7 @@ from __future__ import division
 
 import warnings
 warnings.simplefilter("ignore",UserWarning)
-
+import os
 import argparse
 from mmcv import Config
 
@@ -90,4 +90,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(e)
+        os.system("sudo poweroff")
+    os.system("sudo poweroff")
+
