@@ -95,5 +95,6 @@ if __name__ == '__main__':
     except Exception as e:
         print(e)
         os.system("sudo poweroff")
+    print("DONE, FINISHED!!!")
     os.system("sudo poweroff")
 
