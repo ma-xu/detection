@@ -203,8 +203,7 @@ class Bottleneck(nn.Module):
             planes, planes * self.expansion, kernel_size=1, bias=False)
         self.add_module(self.norm3_name, norm3)
 
-        self.se  = CSELayer(planes * self.expansion)
-
+        self.se  = CSELayer(inplanes, planes * self.expansion)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
         self.stride = stride
@@ -227,9 +226,9 @@ class Bottleneck(nn.Module):
     def forward(self, x):
 
         def _inner_forward(x):
-            identity = x
+            identity = x[0]
 
-            out = self.conv1(x)
+            out = self.conv1(x)[0]
             out = self.norm1(out)
             out = self.relu(out)
 
@@ -249,12 +248,16 @@ class Bottleneck(nn.Module):
             out = self.conv3(out)
             out = self.norm3(out)
 
-            out = self.se(out)
+            out = self.se({0:out,1:x[1]})
 
             if self.downsample is not None:
-                identity = self.downsample(x)
+                identity = self.downsample(x[0])
 
-            out += identity
+            out_x = out[0] + identity
+            out_x = self.relu(out_x)
+            out_att = out[1]
+
+            out = {0: out_x, 1: out_att}
 
             return out
 
