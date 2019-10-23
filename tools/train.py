@@ -4,6 +4,7 @@ import warnings
 warnings.simplefilter("ignore",UserWarning)
 import os
 import argparse
+import traceback
 from mmcv import Config
 
 from mmdet import __version__
@@ -94,6 +95,7 @@ if __name__ == '__main__':
         main()
     except Exception as e:
         print(e)
+        traceback.print_exc()
         os.system("sudo poweroff")
     print("DONE, FINISHED!!!")
     os.system("sudo poweroff")
