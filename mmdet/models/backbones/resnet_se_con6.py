@@ -10,6 +10,7 @@ from mmdet.ops import DeformConv, ModulatedDeformConv
 from ..registry import BACKBONES
 from ..utils import build_norm_layer
 
+torch.autograd.set_detect_anomaly(True)
 
 class CSELayer(nn.Module):
     def __init__(self, in_channel, channel, reduction = 16):
