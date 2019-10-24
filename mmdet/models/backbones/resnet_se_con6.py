@@ -266,7 +266,9 @@ class Bottleneck(nn.Module):
         else:
             out = _inner_forward(x)
 
-        out = {0:self.relu(out[0]),1:out[1]}
+        out_0 = self.relu(out[0])
+        out_1 = out[1]
+        out = {0: out_0, 1: out_1}
 
         return out
 
