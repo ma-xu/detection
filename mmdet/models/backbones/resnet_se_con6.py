@@ -27,12 +27,12 @@ class CSELayer(nn.Module):
             self.att_fc = nn.Sequential(
                 nn.Linear(in_channel, channel),
                 nn.LayerNorm(channel),
-                nn.ReLU(inplace=False)
+                nn.ReLU(inplace=True)
             )
         self.conv = nn.Sequential(
             nn.Conv2d(2, 1, kernel_size=1),
             nn.LayerNorm(channel),
-            nn.ReLU(inplace=False)
+            nn.ReLU(inplace=True)
         )
 
     def forward(self, x):
@@ -45,6 +45,7 @@ class CSELayer(nn.Module):
             all_att = torch.cat((gap.view(b, 1, 1, c), pre_att.view(b, 1, 1, c)), dim=1)
             all_att = self.conv(all_att).view(b, c)
             all_att = self.fc(all_att)
+            del pre_att
         return {0: x[0] * all_att.view(b, c, 1, 1), 1: gap * all_att}
 
 
@@ -267,9 +268,7 @@ class Bottleneck(nn.Module):
         else:
             out = _inner_forward(x)
 
-        out_0 = self.relu(out[0])
-        out_1 = out[1]
-        out = {0: out_0, 1: out_1}
+        out = {0: self.relu(out[0]), 1: out[1]}
 
         return out
 
@@ -487,6 +486,7 @@ class ResNetSEC(nn.Module):
             x = res_layer(x)
             if i in self.out_indices:
                 outs.append(x[0])
+        del x
         if len(outs) == 1:
             return outs[0]
         else:
