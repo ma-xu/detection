@@ -10,7 +10,7 @@ from mmdet.ops import DeformConv, ModulatedDeformConv
 from ..registry import BACKBONES
 from ..utils import build_norm_layer
 
-torch.autograd.set_detect_anomaly(True)
+
 
 class CSELayer(nn.Module):
     def __init__(self, in_channel, channel, reduction = 16):
@@ -476,21 +476,22 @@ class ResNetSEC(nn.Module):
             raise TypeError('pretrained must be a str or None')
 
     def forward(self, x):
-        x = self.conv1(x)
-        x = self.norm1(x)
-        x = self.relu(x)
-        x = self.maxpool(x)
-        x = {0: x, 1: None}
-        outs = []
-        for i, layer_name in enumerate(self.res_layers):
-            res_layer = getattr(self, layer_name)
-            x = res_layer(x)
-            if i in self.out_indices:
-                outs.append(x[0])
-        if len(outs) == 1:
-            return outs[0]
-        else:
-            return tuple(outs)
+        with torch.autograd.set_detect_anomaly(True):
+            x = self.conv1(x)
+            x = self.norm1(x)
+            x = self.relu(x)
+            x = self.maxpool(x)
+            x = {0: x, 1: None}
+            outs = []
+            for i, layer_name in enumerate(self.res_layers):
+                res_layer = getattr(self, layer_name)
+                x = res_layer(x)
+                if i in self.out_indices:
+                    outs.append(x[0])
+            if len(outs) == 1:
+                return outs[0]
+            else:
+                return tuple(outs)
 
     def train(self, mode=True):
         super(ResNetSEC, self).train(mode)
@@ -503,6 +504,6 @@ class ResNetSEC(nn.Module):
 def demo():
     net = ResNetSEC(depth=50)
     y = net(torch.randn(2, 3, 224,224))
-    print(y)
+    # print(y)
 
 demo()
