@@ -266,7 +266,7 @@ class Bottleneck(nn.Module):
         else:
             out = _inner_forward(x)
 
-        out = self.relu(out)
+        out = {0:self.relu(out[0]),1:out[1]}
 
         return out
 
@@ -322,7 +322,7 @@ def make_res_layer(block,
 
 
 @BACKBONES.register_module
-class ResNetSE(nn.Module):
+class ResNetSEC(nn.Module):
     """ResNetSE backbone.
 
     Args:
@@ -368,7 +368,7 @@ class ResNetSE(nn.Module):
                  stage_with_dcn=(False, False, False, False),
                  with_cp=False,
                  zero_init_residual=True):
-        super(ResNetSE, self).__init__()
+        super(ResNetSEC, self).__init__()
         if depth not in self.arch_settings:
             raise KeyError('invalid depth {} for resnet'.format(depth))
         self.depth = depth
@@ -477,21 +477,23 @@ class ResNetSE(nn.Module):
         x = self.norm1(x)
         x = self.relu(x)
         x = self.maxpool(x)
+        x = {0: x, 1: None}
         outs = []
         for i, layer_name in enumerate(self.res_layers):
             res_layer = getattr(self, layer_name)
             x = res_layer(x)
             if i in self.out_indices:
-                outs.append(x)
+                outs.append(x[0])
         if len(outs) == 1:
             return outs[0]
         else:
             return tuple(outs)
 
     def train(self, mode=True):
-        super(ResNetSE, self).train(mode)
+        super(ResNetSEC, self).train(mode)
         if mode and self.norm_eval:
             for m in self.modules():
                 # trick: eval have effect on BatchNorm only
                 if isinstance(m, nn.BatchNorm2d):
                     m.eval()
+

@@ -7,7 +7,8 @@ from .resnet_cbam import ResNetCBAM
 from .resnet_bam import ResNetBAM
 from .resnet_gc import ResNetGC
 from .resnet_sk import ResNetSK
+from .resnet_se_con6 import ResNetSEC
 
 __all__ = ['ResNet', 'ResNeXt', 'SSDVGG', 'ResNetSGE' \
         , 'ResNetSE', 'ResNetCBAM', 'ResNetGC' \
-        , 'ResNetBAM', 'ResNetSK']
+        , 'ResNetBAM', 'ResNetSK', 'ResNetSEC']
