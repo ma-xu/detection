@@ -497,9 +497,9 @@ class ResNetSEC(nn.Module):
                 if isinstance(m, nn.BatchNorm2d):
                     m.eval()
 
-def demo():
-    net = ResNetSEC(depth=50)
-    y = net(torch.randn(2, 3, 224,224))
-    print(y.size())
-
-demo()
+# def demo():
+#     net = ResNetSEC(depth=50)
+#     y = net(torch.randn(2, 3, 224,224))
+#     print(y)
+#
+# demo()
