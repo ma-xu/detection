@@ -26,12 +26,12 @@ class CSELayer(nn.Module):
             self.att_fc = nn.Sequential(
                 nn.Linear(in_channel, channel),
                 nn.LayerNorm(channel),
-                nn.ReLU(inplace=True)
+                nn.ReLU(inplace=False)
             )
         self.conv = nn.Sequential(
             nn.Conv2d(2, 1, kernel_size=1),
             nn.LayerNorm(channel),
-            nn.ReLU(inplace=True)
+            nn.ReLU(inplace=False)
         )
 
     def forward(self, x):
