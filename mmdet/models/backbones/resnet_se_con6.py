@@ -205,7 +205,7 @@ class Bottleneck(nn.Module):
         self.add_module(self.norm3_name, norm3)
 
         self.se  = CSELayer(inplanes, planes * self.expansion)
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.ReLU(inplace=False)
         self.downsample = downsample
         self.stride = stride
         self.dilation = dilation
@@ -435,7 +435,7 @@ class ResNetSEC(nn.Module):
         self.norm1_name, norm1 = build_norm_layer(
             self.normalize, 64, postfix=1)
         self.add_module(self.norm1_name, norm1)
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.ReLU(inplace=False)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
     def _freeze_stages(self):
@@ -476,22 +476,21 @@ class ResNetSEC(nn.Module):
             raise TypeError('pretrained must be a str or None')
 
     def forward(self, x):
-        with torch.autograd.set_detect_anomaly(True):
-            x = self.conv1(x)
-            x = self.norm1(x)
-            x = self.relu(x)
-            x = self.maxpool(x)
-            x = {0: x, 1: None}
-            outs = []
-            for i, layer_name in enumerate(self.res_layers):
-                res_layer = getattr(self, layer_name)
-                x = res_layer(x)
-                if i in self.out_indices:
-                    outs.append(x[0])
-            if len(outs) == 1:
-                return outs[0]
-            else:
-                return tuple(outs)
+        x = self.conv1(x)
+        x = self.norm1(x)
+        x = self.relu(x)
+        x = self.maxpool(x)
+        x = {0: x, 1: None}
+        outs = []
+        for i, layer_name in enumerate(self.res_layers):
+            res_layer = getattr(self, layer_name)
+            x = res_layer(x)
+            if i in self.out_indices:
+                outs.append(x[0])
+        if len(outs) == 1:
+            return outs[0]
+        else:
+            return tuple(outs)
 
     def train(self, mode=True):
         super(ResNetSEC, self).train(mode)
@@ -501,9 +500,9 @@ class ResNetSEC(nn.Module):
                 if isinstance(m, nn.BatchNorm2d):
                     m.eval()
 
-def demo():
-    net = ResNetSEC(depth=50)
-    y = net(torch.randn(2, 3, 224,224))
-    # print(y)
-
-demo()
+# def demo():
+#     net = ResNetSEC(depth=50)
+#     y = net(torch.randn(2, 3, 224,224))
+#     # print(y)
+#
+# demo()
