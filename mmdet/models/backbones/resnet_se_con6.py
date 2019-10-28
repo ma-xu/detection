@@ -22,7 +22,7 @@ class CSELayer(nn.Module):
                         nn.Linear(channel // reduction, channel),
                         nn.Sigmoid()
                 )
-        print('add one SELayer!')
+        print('add one CSELayer!')
         if in_channel != channel:
             self.att_fc = nn.Sequential(
                 nn.Linear(in_channel, channel),
@@ -500,9 +500,11 @@ class ResNetSEC(nn.Module):
                 if isinstance(m, nn.BatchNorm2d):
                     m.eval()
 
-# def demo():
-#     net = ResNetSEC(depth=50)
-#     y = net(torch.randn(2, 3, 224,224))
-#     # print(y)
-#
-# demo()
+def demo():
+    net = ResNetSEC(depth=50)
+    net = net.to('cuda')
+    print("\nAllocated GPU memory:", torch.cuda.memory_allocated())
+    y = net(torch.randn(2, 3, 224,224))
+    # print(y)
+
+demo()
