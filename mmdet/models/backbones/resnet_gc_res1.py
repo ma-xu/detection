@@ -305,7 +305,7 @@ class Bottleneck(nn.Module):
         self.rgc = RContextBlock2d(inplanes, planes * self.expansion, (planes * self.expansion) // 16)
 
 
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.ReLU(inplace=False)
         self.downsample = downsample
         self.stride = stride
         self.dilation = dilation
