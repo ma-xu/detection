@@ -352,7 +352,7 @@ class Bottleneck(nn.Module):
             out = self.rgc({0: out, 1: x[1]})
 
             if self.downsample is not None:
-                identity = self.downsample(x)
+                identity = self.downsample(x[0])
 
             out_x = out[0] + identity
             out_x = self.relu(out_x)
