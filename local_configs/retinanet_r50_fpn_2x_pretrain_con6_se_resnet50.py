@@ -104,7 +104,7 @@ lr_config = dict(
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(
-    interval=10,
+    interval=100,
     hooks=[
         dict(type='TextLoggerHook'),
         # dict(type='TensorboardLoggerHook')
@@ -112,7 +112,7 @@ log_config = dict(
 # yapf:enable
 # runtime settings
 total_epochs = 24
-device_ids = range(2)
+device_ids = range(8)
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 work_dir = './work_dirs/retinanet_r50_fpn_2x_pretrain_c6_se_resnet50'
