@@ -504,7 +504,7 @@ def demo():
     net = ResNetSEC(depth=50)
     net.to('cuda')
     y = net(torch.randn((2, 3, 1333, 800),device=torch.device("cuda")))
-    print("SE allocated: {}".format(torch.cuda.memory_allocated()))
+    print("CSE allocated: {}".format(torch.cuda.memory_allocated()))
     # print(y)
 #
 demo()
