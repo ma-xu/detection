@@ -482,7 +482,7 @@ class ResNetSE(nn.Module):
 def demo():
     net = ResNetSE(depth=50)
     net.to('cuda')
-    y = net(torch.randn(2, 3, 224,224))
+    y = net(torch.randn((2, 3, 1333, 800),device=torch.device("cuda")))
     print("SE allocated: {}".format(torch.cuda.memory_allocated()))
     # print(y)
 
