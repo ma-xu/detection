@@ -500,9 +500,11 @@ class ResNetSEC(nn.Module):
                 if isinstance(m, nn.BatchNorm2d):
                     m.eval()
 
-# def demo():
-#     net = ResNetSEC(depth=50)
-#     y = net(torch.randn(2, 3, 224,224))
-#     # print(y)
+def demo():
+    net = ResNetSEC(depth=50)
+    net.to('cuda')
+    y = net(torch.randn(2, 3, 224,224))
+    print("SE allocated: {}".format(torch.cuda.memory_allocated()))
+    # print(y)
 #
-# demo()
+demo()

@@ -1,6 +1,7 @@
 import logging
 
 import torch.nn as nn
+import torch
 import torch.utils.checkpoint as cp
 
 from mmcv.cnn import constant_init, kaiming_init
@@ -475,3 +476,14 @@ class ResNetSE(nn.Module):
                 # trick: eval have effect on BatchNorm only
                 if isinstance(m, nn.BatchNorm2d):
                     m.eval()
+
+
+
+def demo():
+    net = ResNetSE(depth=50)
+    net.to('cuda')
+    y = net(torch.randn(2, 3, 224,224))
+    print("SE allocated: {}".format(torch.cuda.memory_allocated()))
+    # print(y)
+
+demo()
