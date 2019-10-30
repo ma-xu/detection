@@ -213,6 +213,7 @@ class Bottleneck(nn.Module):
         self.dilation = dilation
         self.with_cp = with_cp
         self.normalize = normalize
+        self.avgpool = nn.AdaptiveAvgPool2d(1)
 
     @property
     def norm1(self):
@@ -259,7 +260,7 @@ class Bottleneck(nn.Module):
             out_x = out + identity
             out_x = self.relu(out_x)
             out_x = self.relu(out_x)
-            out_att = F.adaptive_avg_pool2d(out, 1).squeeze(-1).squeeze(-1)
+            out_att = self.avgpool(out).squeeze(-1).squeeze(-1)
 
             out = {0: out_x, 1: out_att}
 
