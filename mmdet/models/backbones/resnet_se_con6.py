@@ -257,6 +257,7 @@ class Bottleneck(nn.Module):
 
             out_x = out[0] + identity
             out_x = self.relu(out_x)
+            out_x.backward()
             out_att = out[1]
 
             out = {0: out_x, 1: out_att}
@@ -504,7 +505,6 @@ def demo():
     net = ResNetSEC(depth=50)
     net.to('cuda')
     y = net(torch.randn((2, 3, 1333, 800),device=torch.device("cuda")))
-    y.backward()
     print("CSE allocated: {}".format(torch.cuda.memory_allocated()))
     # print(y)
 #
