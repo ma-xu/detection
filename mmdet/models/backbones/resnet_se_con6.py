@@ -45,7 +45,7 @@ class CSELayer(nn.Module):
             all_att = torch.cat((gap.view(b, 1, 1, c), pre_att.view(b, 1, 1, c)), dim=1)
             all_att = self.conv(all_att).view(b, c)
             all_att = self.fc(all_att)
-            
+
         return {0: x[0] * all_att.view(b, c, 1, 1), 1: gap * all_att}
 
 
@@ -206,7 +206,7 @@ class Bottleneck(nn.Module):
         self.add_module(self.norm3_name, norm3)
 
         self.se  = CSELayer(inplanes, planes * self.expansion)
-        self.relu = nn.ReLU(inplace=False)
+        self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
         self.stride = stride
         self.dilation = dilation
