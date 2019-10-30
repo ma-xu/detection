@@ -255,9 +255,8 @@ class Bottleneck(nn.Module):
             if self.downsample is not None:
                 identity = self.downsample(x[0])
 
-            out_x = out[0] + identity
+            out_x = out[0].clone() + identity
             out_x = self.relu(out_x)
-            out_x.backward()
             out_att = out[1]
 
             out = {0: out_x, 1: out_att}
