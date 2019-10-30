@@ -486,4 +486,4 @@ def demo():
     print("SE allocated: {}".format(torch.cuda.memory_allocated()))
     # print(y)
 
-demo()
+# demo()
