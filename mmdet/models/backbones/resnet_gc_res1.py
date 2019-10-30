@@ -601,9 +601,9 @@ class ResNetGCDCA(nn.Module):
 
 
 
-def demo():
-    net = ResNetGCDCA(depth=50)
-    y = net(torch.randn(2, 3, 224,224))
-    # print(y)
-
-demo()
+# def demo():
+#     net = ResNetGCDCA(depth=50)
+#     y = net(torch.randn(2, 3, 224,224))
+#     # print(y)
+#
+# demo()
