@@ -305,7 +305,7 @@ class Bottleneck(nn.Module):
         self.rgc = RContextBlock2d(inplanes, planes * self.expansion, (planes * self.expansion) // 16)
 
 
-        self.relu = nn.ReLU(inplace=False)
+        self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
         self.stride = stride
         self.dilation = dilation
@@ -354,7 +354,7 @@ class Bottleneck(nn.Module):
             if self.downsample is not None:
                 identity = self.downsample(x[0])
 
-            out_x = out[0] + identity
+            out_x = out[0].clone() + identity
             out_x = self.relu(out_x)
             out_att = out[1]
 
@@ -368,7 +368,7 @@ class Bottleneck(nn.Module):
             out = _inner_forward(x)
 
 
-        out = {0: self.relu(out[0]), 1: out[1]}
+        out = {0: self.relu(out[0].clone()), 1: out[1]}
 
         return out
 
