@@ -22,7 +22,7 @@ class SELayer(nn.Module):
                         nn.Linear(channel // reduction, channel),
                         nn.Sigmoid()
                 )
-        print('add one SELayer!')
+        # print('add one SELayer!')
 
     def forward(self, x):
         b, c, _, _ = x.size()
