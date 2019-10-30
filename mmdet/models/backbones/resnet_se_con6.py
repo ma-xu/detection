@@ -2,7 +2,6 @@ import logging
 import torch
 import torch.nn as nn
 import torch.utils.checkpoint as cp
-import torch.nn.functional as F
 
 from mmcv.cnn import constant_init, kaiming_init
 from mmcv.runner import load_checkpoint
@@ -47,7 +46,7 @@ class CSELayer(nn.Module):
             all_att = self.conv(all_att).view(b, c)
             all_att = self.fc(all_att)
             del pre_att
-        return x[0] * all_att.view(b, c, 1, 1)
+        return {0: x[0] * all_att.view(b, c, 1, 1), 1: gap * all_att}
 
 
 def conv3x3(in_planes, out_planes, stride=1, dilation=1):
@@ -213,7 +212,6 @@ class Bottleneck(nn.Module):
         self.dilation = dilation
         self.with_cp = with_cp
         self.normalize = normalize
-        self.avgpool = nn.AdaptiveAvgPool2d(1)
 
     @property
     def norm1(self):
@@ -257,10 +255,9 @@ class Bottleneck(nn.Module):
             if self.downsample is not None:
                 identity = self.downsample(x[0])
 
-            out_x = out + identity
+            out_x = out[0] + identity
             out_x = self.relu(out_x)
-            out_x = self.relu(out_x)
-            out_att = self.avgpool(out).squeeze(-1).squeeze(-1)
+            out_att = out[1]
 
             out = {0: out_x, 1: out_att}
 
@@ -437,7 +434,7 @@ class ResNetSEC(nn.Module):
         self.norm1_name, norm1 = build_norm_layer(
             self.normalize, 64, postfix=1)
         self.add_module(self.norm1_name, norm1)
-        self.relu = nn.ReLU(inplace=False)
+        self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
     def _freeze_stages(self):
@@ -507,7 +504,6 @@ def demo():
     net = ResNetSEC(depth=50)
     net.to('cuda')
     y = net(torch.randn((2, 3, 1333, 800),device=torch.device("cuda")))
-    print("MAX allocated: {}".format(torch.cuda.max_memory_allocated()))
     print("CSE allocated: {}".format(torch.cuda.memory_allocated()))
     # print(y)
 #
