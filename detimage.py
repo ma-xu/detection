@@ -3,7 +3,7 @@ from mmcv.runner import load_checkpoint
 from mmdet.models import build_detector
 from mmdet.apis import inference_detector, show_result
 
-cfg = mmcv.Config.fromfile('local_configs/retinanet_r50_fpn_2x_pretrain_c6_se_resnet50.py')
+cfg = mmcv.Config.fromfile('local_configs/retinanet_r50_fpn_2x_pretrain_con6_se_resnet50.py')
 cfg.model.pretrained = None
 
 # construct the model and load checkpoint
