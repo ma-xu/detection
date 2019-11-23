@@ -16,7 +16,7 @@ _ = load_checkpoint(model, './work_dirs/retinanet_r50_fpn_2x_pretrain_old_resnet
 # show_result(img, result)
 
 # test a list of images
-imgs = ['1.jpg', '2.jpg','0.jpg', '3.jpg']
+imgs = ['0.jpg', '1.jpg','2.jpg', '3.jpg', '4.jpg','5.jpg', '6.jpg', '7.jpg','8.jpg', '9.jpg', '10.jpg']
 for i, result in enumerate(inference_detector(model, imgs, cfg, device='cuda:0')):
     print(i, imgs[i])
     # show_result(imgs[i], result)
