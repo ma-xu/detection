@@ -24,4 +24,4 @@ for i, result in enumerate(inference_detector(model, imgs, cfg, device='cuda:0')
     # show_result(img, result, model.CLASSES)
     # or save the visualization results to image files
     outname='det_'+imgs[i]
-    show_result(imgs[i], result, model.CLASSES, out_file=outname)
+    show_result(imgs[i], result, out_file=outname)
