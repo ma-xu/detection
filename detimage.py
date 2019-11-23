@@ -11,17 +11,17 @@ model = build_detector(cfg.model, test_cfg=cfg.test_cfg)
 _ = load_checkpoint(model, './work_dirs/retinanet_r50_fpn_2x_pretrain_old_resnet50/epoch_24.pth')
 
 # test a single image
-img = mmcv.imread('test.jpg')
-result = inference_detector(model, img, cfg)
-show_result(img, result)
+# img = mmcv.imread('test.jpg')
+# result = inference_detector(model, img, cfg)
+# show_result(img, result)
 
 # test a list of images
 imgs = ['1.jpg', '2.jpg','0.jpg', '3.jpg']
 for i, result in enumerate(inference_detector(model, imgs, cfg, device='cuda:0')):
     print(i, imgs[i])
-    show_result(imgs[i], result)
+    # show_result(imgs[i], result)
     # visualize the results in a new window
     # show_result(img, result, model.CLASSES)
     # or save the visualization results to image files
     outname='det_'+imgs[i]
-    show_result(img, result, model.CLASSES, out_file=outname)
+    show_result(imgs[i], result, model.CLASSES, out_file=outname)
