@@ -1,0 +1,54 @@
+Requirements:
+1. TCP segment structure.
+2. Assumed it to be of 0 bytes.
+3. Connection.
+4. TCP 3-way handshake.
+
+
+
+
+pseudo-code：
+
+
+"client.c":
+
+1. Define Structure TCP_Header;
+2. Function: SET Header to 0;
+3. Function: Header assignment;
+4. Function: checkSum;
+5. Function: print TCP header;
+6. Function: populate header;
+
+MAIN{
+	1. Build connection;
+	2. Send the requesting TCP Segment;
+	3. Recieve connection granted TCP Segment;
+	4. Send the Acknowledgement TCP Segment;
+	5. Send the Close Request TCP segment
+	6. Recieve the close request acknowledgement TCP segment;
+	7. Recieve the second close request acknowledgment TCP segment;
+	8. Send the final acknowledgement TCP segment;
+}
+
+
+
+
+
+"server.c":
+1. Define Structure TCP_Header;
+2. Function: SET Header to 0;
+3. Function: Header assignment;
+4. Function: checkSum;
+5. Function: print TCP header;
+6. Function: populate header;
+
+MAIN{
+	1. Build connection;
+	2. Accept an incoming connection;
+	3. Generate connection granted TCP segment;
+	4. Handle the received acknowledgement TCP segment;
+	5. Handle the received close request TCP segment;
+	6. Send the first close request acknowledgement TCP segment;
+	7. Send the second close request acknowledgement TCP segment; 
+	8. Handle he received final acknowledgement TCP segment;
+}
