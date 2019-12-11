@@ -9,7 +9,8 @@ from .resnet_gc import ResNetGC
 from .resnet_sk import ResNetSK
 from .resnet_se_con6 import ResNetSEC
 from .resnet_gc_res1 import ResNetGCDCA
+from .resnet_na import ResNetNA
 
 __all__ = ['ResNet', 'ResNeXt', 'SSDVGG', 'ResNetSGE' \
         , 'ResNetSE', 'ResNetCBAM', 'ResNetGC' \
-        , 'ResNetBAM', 'ResNetSK', 'ResNetSEC','ResNetGCDCA']
+        , 'ResNetBAM', 'ResNetSK', 'ResNetSEC','ResNetGCDCA','ResNetNA']
