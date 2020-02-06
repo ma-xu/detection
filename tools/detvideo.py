@@ -29,7 +29,7 @@ _ = load_checkpoint(model, '../work_dirs/retinanet_r50_fpn_2x_pretrain_na_resnet
 """
 
 
-video = mmcv.VideoReader('IMG_0593.mp4')
+video = mmcv.VideoReader('/home/g1007540910/detection/work_dirs/IMG_0593.mp4')
 for frame in video:
     result = inference_detector(model, frame)
     print("1")
