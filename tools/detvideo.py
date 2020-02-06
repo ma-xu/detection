@@ -37,6 +37,7 @@ print(video.__len__())
 
 i=0
 for frame in video:
+    break
     result = inference_detector(model, frame,cfg)
     i = i+1
     print("procesing frame: {}   /   {}".format(i,video.__len__()))
