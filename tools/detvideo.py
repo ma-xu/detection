@@ -3,6 +3,9 @@ from mmcv.runner import load_checkpoint
 from mmdet.models import build_detector
 from mmdet.apis import inference_detector, show_result
 
+mmcv.frames2video('frames', 'result.avi')
+
+
 cfg = mmcv.Config.fromfile('../local_configs/retinanet_r50_fpn_2x_pretrain_na_resnet50.py')
 cfg.model.pretrained = None
 
