@@ -2,7 +2,7 @@ import mmcv
 from mmcv.runner import load_checkpoint
 from mmdet.models import build_detector
 from mmdet.apis import inference_detector, show_result
-
+import time
 
 
 
@@ -36,9 +36,14 @@ video = mmcv.VideoReader('/home/g1007540910/detection/work_dirs/IMG_0593.mp4')
 print(video.__len__())
 
 i=-1
+# for frame in video:
+#     result = inference_detector(model, frame,cfg)
+#     i = i+1
+#     print("procesing frame: {}   /   {}".format(i,video.__len__()))
+#     show_result(frame, result, out_file="frames/"+str(i).zfill(6)+".jpg")
+# mmcv.frames2video('frames', 'result.avi')
+
+st = time.perf_counter()
 for frame in video:
-    result = inference_detector(model, frame,cfg)
-    i = i+1
-    print("procesing frame: {}   /   {}".format(i,video.__len__()))
-    show_result(frame, result, out_file="frames/"+str(i).zfill(6)+".jpg")
-mmcv.frames2video('frames', 'result.avi')
+    result = inference_detector(model, frame, cfg)
+print("Total ime: {}".format(time.perf_counter() - st))
