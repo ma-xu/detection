@@ -3,7 +3,7 @@ from mmcv.runner import load_checkpoint
 from mmdet.models import build_detector
 from mmdet.apis import inference_detector, show_result
 
-mmcv.frames2video('frames', 'result.avi')
+
 
 
 cfg = mmcv.Config.fromfile('../local_configs/retinanet_r50_fpn_2x_pretrain_na_resnet50.py')
@@ -35,10 +35,10 @@ _ = load_checkpoint(model, '../work_dirs/retinanet_r50_fpn_2x_pretrain_na_resnet
 video = mmcv.VideoReader('/home/g1007540910/detection/work_dirs/IMG_0593.mp4')
 print(video.__len__())
 
-i=0
+i=-1
 for frame in video:
-    break
     result = inference_detector(model, frame,cfg)
     i = i+1
     print("procesing frame: {}   /   {}".format(i,video.__len__()))
-    show_result(frame, result, out_file="frames/"+str(i)+".jpg")
+    show_result(frame, result, out_file="frames/"+str(i).zfill(6)+".jpg")
+mmcv.frames2video('frames', 'result.avi')
