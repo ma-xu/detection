@@ -30,6 +30,7 @@ _ = load_checkpoint(model, '../work_dirs/retinanet_r50_fpn_2x_pretrain_na_resnet
 
 
 video = mmcv.VideoReader('/home/g1007540910/detection/work_dirs/IMG_0593.mp4')
+print(video.__len__())
 for frame in video:
     print(frame)
     break
