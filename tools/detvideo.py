@@ -31,10 +31,10 @@ _ = load_checkpoint(model, '../work_dirs/retinanet_r50_fpn_2x_pretrain_na_resnet
 
 video = mmcv.VideoReader('/home/g1007540910/detection/work_dirs/IMG_0593.mp4')
 print(video.__len__())
+
+i=0
 for frame in video:
-    print(frame)
-    break
     result = inference_detector(model, frame,cfg)
-    print("1")
-    show_result(frame, result, model.CLASSES, wait_time=1)
-    show_result(frame, result, out_file=outname)
+    i = i+1
+    print("procesing frame: {}   /   {}".format(i,video.__len__()))
+    show_result(frame, result, out_file="frames/"+str(i)+".jpg")
