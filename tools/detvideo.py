@@ -46,4 +46,4 @@ i=-1
 st = time.perf_counter()
 for frame in video:
     result = inference_detector(model, frame, cfg)
-print("Total ime: {}".format(time.perf_counter() - st))
+print("Total time: {}".format(time.perf_counter() - st))
