@@ -1,6 +1,7 @@
 import logging
 
 import torch.nn as nn
+import torch
 import torch.utils.checkpoint as cp
 
 from mmcv.cnn import constant_init, kaiming_init
@@ -9,6 +10,85 @@ from mmcv.runner import load_checkpoint
 from mmdet.ops import DeformConv, ModulatedDeformConv
 from ..registry import BACKBONES
 from ..utils import build_norm_layer
+
+
+class CropLayer(nn.Module):
+
+    #   E.g., (-1, 0) means this layer should crop the first and last rows of the feature map. And (0, -1) crops the first and last columns
+    def __init__(self, crop_set):
+        super(CropLayer, self).__init__()
+        self.rows_to_crop = - crop_set[0]
+        self.cols_to_crop = - crop_set[1]
+        assert self.rows_to_crop >= 0
+        assert self.cols_to_crop >= 0
+
+    def forward(self, input):
+        return input[:, :, self.rows_to_crop:-self.rows_to_crop, self.cols_to_crop:-self.cols_to_crop]
+
+
+class ACBlock(nn.Module):
+
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, padding_mode='zeros', deploy=False):
+        super(ACBlock, self).__init__()
+        center_offset_from_origin_border = padding - kernel_size // 2
+        ver_pad_or_crop = (center_offset_from_origin_border + 1, center_offset_from_origin_border)
+        hor_pad_or_crop = (center_offset_from_origin_border, center_offset_from_origin_border + 1)
+        if center_offset_from_origin_border >= 0:
+            self.ver_conv_crop_layer = nn.Identity()
+            ver_conv_padding = ver_pad_or_crop
+            self.hor_conv_crop_layer = nn.Identity()
+            hor_conv_padding = hor_pad_or_crop
+        else:
+            self.ver_conv_crop_layer = CropLayer(crop_set=ver_pad_or_crop)
+            ver_conv_padding = (0, 0)
+            self.hor_conv_crop_layer = CropLayer(crop_set=hor_pad_or_crop)
+            hor_conv_padding = (0, 0)
+        self.ver_conv = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=(3, 1),
+                                  stride=stride,
+                                  padding=ver_conv_padding, dilation=dilation, groups=groups, bias=False,
+                                  padding_mode=padding_mode)
+
+        self.hor_conv = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=(1, 3),
+                                  stride=stride,
+                                  padding=hor_conv_padding, dilation=dilation, groups=groups, bias=False,
+                                  padding_mode=padding_mode)
+        self.ver_bn = nn.BatchNorm2d(num_features=out_channels)
+        self.hor_bn = nn.BatchNorm2d(num_features=out_channels)
+
+
+
+    def forward(self, input):
+        # print(square_outputs.size())
+        # return square_outputs
+        vertical_outputs = self.ver_conv_crop_layer(input)
+        vertical_outputs = self.ver_conv(vertical_outputs)
+        vertical_outputs = self.ver_bn(vertical_outputs)
+        # print(vertical_outputs.size())
+        horizontal_outputs = self.hor_conv_crop_layer(input)
+        horizontal_outputs = self.hor_conv(horizontal_outputs)
+        horizontal_outputs = self.hor_bn(horizontal_outputs)
+        # print(horizontal_outputs.size())
+        return vertical_outputs + horizontal_outputs
+
+
+class AssConv(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=1, bias=False):
+        super(AssConv, self).__init__()
+        self.ori_conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, bias=bias)
+        self.new_conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, bias=bias)
+        self.ac_convbn = ACBlock(in_channels,out_channels,kernel_size,stride,padding)
+        self.group_conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, groups=64, bias=bias)
+
+        self.ori_bn =  nn.BatchNorm2d(out_channels)
+        self.new_bn = nn.BatchNorm2d(out_channels)
+        self.group_bn = nn.BatchNorm2d(out_channels)
+
+
+    def forward(self, input):
+        return self.ori_bn(self.ori_conv(input))+self.new_bn(self.new_conv(input))\
+               +self.ac_convbn(input)+self.group_bn(self.group_conv(input))
+
+
 
 
 def conv3x3(in_planes, out_planes, stride=1, dilation=1):
@@ -93,7 +173,7 @@ class Bottleneck(nn.Module):
                  with_cp=False,
                  normalize=dict(type='BN'),
                  dcn=None):
-        """Bottleneck block for ResNet.
+        """Bottleneck block for ResNetSE.
         If style is "pytorch", the stride-two layer is the 3x3 conv layer,
         if it is "caffe", the stride-two layer is the first 1x1 conv layer.
         """
@@ -130,14 +210,15 @@ class Bottleneck(nn.Module):
             fallback_on_stride = dcn.get('fallback_on_stride', False)
             self.with_modulated_dcn = dcn.get('modulated', False)
         if not self.with_dcn or fallback_on_stride:
-            self.conv2 = nn.Conv2d(
-                planes,
-                planes,
-                kernel_size=3,
-                stride=self.conv2_stride,
-                padding=dilation,
-                dilation=dilation,
-                bias=False)
+            # self.conv2 = nn.Conv2d(
+            #     planes,
+            #     planes,
+            #     kernel_size=3,
+            #     stride=self.conv2_stride,
+            #     padding=dilation,
+            #     dilation=dilation,
+            #     bias=False)
+            self.conv2 = AssConv(planes, planes, kernel_size=3, stride=self.conv2_stride, padding=dilation, bias=False)
         else:
             deformable_groups = dcn.get('deformable_groups', 1)
             if not self.with_modulated_dcn:
@@ -162,10 +243,12 @@ class Bottleneck(nn.Module):
                 dilation=dilation,
                 deformable_groups=deformable_groups,
                 bias=False)
-        self.add_module(self.norm2_name, norm2)
+        # self.add_module(self.norm2_name, norm2)
         self.conv3 = nn.Conv2d(
             planes, planes * self.expansion, kernel_size=1, bias=False)
         self.add_module(self.norm3_name, norm3)
+
+        # self.se  = SELayer(planes * self.expansion)
 
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
@@ -210,6 +293,8 @@ class Bottleneck(nn.Module):
 
             out = self.conv3(out)
             out = self.norm3(out)
+
+            # out = self.se(out)
 
             if self.downsample is not None:
                 identity = self.downsample(x)
@@ -279,8 +364,8 @@ def make_res_layer(block,
 
 
 @BACKBONES.register_module
-class ResNet(nn.Module):
-    """ResNet backbone.
+class ResNetNew1(nn.Module):
+    """ResNetNew1 backbone.
 
     Args:
         depth (int): Depth of resnet, from {18, 34, 50, 101, 152}.
@@ -325,7 +410,7 @@ class ResNet(nn.Module):
                  stage_with_dcn=(False, False, False, False),
                  with_cp=False,
                  zero_init_residual=True):
-        super(ResNet, self).__init__()
+        super(ResNetNew1, self).__init__()
         if depth not in self.arch_settings:
             raise KeyError('invalid depth {} for resnet'.format(depth))
         self.depth = depth
@@ -446,9 +531,20 @@ class ResNet(nn.Module):
             return tuple(outs)
 
     def train(self, mode=True):
-        super(ResNet, self).train(mode)
+        super(ResNetNew1, self).train(mode)
         if mode and self.norm_eval:
             for m in self.modules():
                 # trick: eval have effect on BatchNorm only
                 if isinstance(m, nn.BatchNorm2d):
                     m.eval()
+
+
+
+def demo():
+    net = ResNetNew1(depth=50)
+    net.to('cuda')
+    y = net(torch.randn((2, 3, 1333, 800),device=torch.device("cuda")))
+    print("SE allocated: {}".format(torch.cuda.memory_allocated()))
+    # print(y)
+
+# demo()

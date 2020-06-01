@@ -12,7 +12,10 @@ from .resnet_gc_res1 import ResNetGCDCA
 from .resnet_na import ResNetNA
 from .resnet_prm import ResNetPRM
 from .resnet_pf import ResNetPF
+from .resnet_new1 import ResNetNew1
+from .resnet_new3 import ResNetNew3
 
 __all__ = ['ResNet', 'ResNeXt', 'SSDVGG', 'ResNetSGE' \
         , 'ResNetSE', 'ResNetCBAM', 'ResNetGC' \
-        , 'ResNetBAM', 'ResNetSK', 'ResNetSEC','ResNetGCDCA','ResNetNA','ResNetPRM','ResNetPF']
+        , 'ResNetBAM', 'ResNetSK', 'ResNetSEC','ResNetGCDCA',
+           'ResNetNA','ResNetPRM','ResNetPF','ResNetNew1','ResNetNew3']
