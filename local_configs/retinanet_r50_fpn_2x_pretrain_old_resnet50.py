@@ -2,7 +2,7 @@
 model = dict(
     type='RetinaNet',
     # pretrained='modelzoo://resnet50',
-    pretrained='/home/g1007540910/RDA_imagenet_GCP/checkpoints/imagenet/old_resnet50/model_best_single.pth.tar',
+    pretrained='/home/g1007540910/checkpoints/imagenet/old_resnet50/model_best_single.pth.tar',
     backbone=dict(
         type='ResNet',
         depth=50,
