@@ -199,13 +199,16 @@ class Bottleneck(nn.Module):
             out = self.relu(out)
 
             if not self.with_dcn:
+                print("forward: not self.with_dcn")
                 out = self.conv2(out)
             elif self.with_modulated_dcn:
+                print("forward: self.with_modulated_dcn")
                 offset_mask = self.conv2_offset(out)
                 offset = offset_mask[:, :18, :, :]
                 mask = offset_mask[:, -9:, :, :].sigmoid()
                 out = self.conv2(out, offset, mask)
             else:
+                print("forward: else")
                 offset = self.conv2_offset(out)
                 out = self.conv2(out, offset)
             out = self.norm2(out)
