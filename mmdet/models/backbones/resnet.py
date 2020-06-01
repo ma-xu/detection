@@ -127,9 +127,11 @@ class Bottleneck(nn.Module):
         fallback_on_stride = False
         self.with_modulated_dcn = False
         if self.with_dcn:
+            print("Running: self.with_dcn")
             fallback_on_stride = dcn.get('fallback_on_stride', False)
             self.with_modulated_dcn = dcn.get('modulated', False)
         if not self.with_dcn or fallback_on_stride:
+            print("Running: not self.with_dcn or fallback_on_stride")
             self.conv2 = nn.Conv2d(
                 planes,
                 planes,
@@ -139,6 +141,7 @@ class Bottleneck(nn.Module):
                 dilation=dilation,
                 bias=False)
         else:
+            print("Running: Else")
             deformable_groups = dcn.get('deformable_groups', 1)
             if not self.with_modulated_dcn:
                 conv_op = DeformConv
