@@ -305,7 +305,7 @@ class Bottleneck(nn.Module):
             else:
                 offset = self.conv2_offset(out)
                 out = self.conv2(out, offset)
-            out = self.norm2(out)
+            # out = self.norm2(out)
             out = self.relu(out)
 
             out = self.conv3(out)
