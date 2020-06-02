@@ -117,5 +117,5 @@ dist_params = dict(backend='nccl')
 log_level = 'INFO'
 work_dir = './work_dirs/retinanet_r50_fpn_2x_pretrain_new3_resnet50'
 load_from = None
-resume_from = None
+resume_from = './work_dirs/retinanet_r50_fpn_2x_pretrain_new3_resnet50/epoch_8.pth'
 workflow = [('train', 1)]
